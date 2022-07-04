@@ -14,17 +14,18 @@ MonoBehaviour:
   id: captchaTheFlag
   title: Captcha The Flag
   author: Blananas2
-  description: 'Flavor text here
+  description: 'Essentially, just work out the solution to the CAPTCHA to help Captcha
+    play Capture. Quite simple really.
 
 
-    Module by Blananas2
+    Implemented by Blananas2
 
-    Other credits go here
+    Idea by twinightcreep0
 
 
-    Module ID: ab
+    Module ID: captchaTheFlag
 
-    The manual can be found here: https://ktane.timwi.de/HTML/A%20B.html'
+    The manual can be found here: https://ktane.timwi.de/HTML/Captcha%20The%20Flag.html'
   version: 
   outputFolder: build
-  previewImage: {fileID: 0}
+  previewImage: {fileID: 2800000, guid: e30ba56fd29f91e42b2e25737d038f52, type: 3}

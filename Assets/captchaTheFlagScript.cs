@@ -15,9 +15,13 @@ public class captchaTheFlagScript : MonoBehaviour {
     public KMSelectable[] FlagButtons;
     public KMSelectable SubmitButton;
     public GameObject[] Flags;
-    public TextMesh PLACEHOLDER;
     public SpriteRenderer[] ForFade;
     public TextMesh StageCounter;
+
+    public TextMesh PLACEHOLDER;
+    public Sprite[] Cares;
+    public SpriteRenderer[] Who;
+    public Sprite Empty;
 
     string charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     int[] sinis = { 3, 3, 2, 1, 0, 4, 4, 4, 2, 3, 3, 2, 1, 0, 4, 4, 4, 2, 3, 0, 3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 0, 7, 7, 1, 5 };
@@ -62,7 +66,7 @@ public class captchaTheFlagScript : MonoBehaviour {
             cap += charset.PickRandom();
         }
         ser = Bomb.GetSerialNumber();
-        PLACEHOLDER.text = cap;
+        GenerateCAPTCHA(cap);
 
         Debug.LogFormat("[Captcha the Flag #{0}] CAPTCHA is {1}, Serial Number is {2}.", moduleId, cap, ser);
 
@@ -106,6 +110,13 @@ public class captchaTheFlagScript : MonoBehaviour {
             desired[2 * h + 1] = rightFlag; 
 
             Debug.LogFormat("[Captcha the Flag #{0}] {1}", moduleId, log);
+        }
+    }
+
+    void GenerateCAPTCHA (string input) {
+        for (int c = 0; c < 6; c++) {
+            int b = charset.IndexOf(input[c]);
+            Who[c].sprite = Cares[b * 36 + UnityEngine.Random.Range(0, 36)];
         }
     }
 
@@ -155,11 +166,6 @@ public class captchaTheFlagScript : MonoBehaviour {
         }
 
         if (valid) {
-            if (hidden) {
-                for (int z = 0; z < 3; z++) {
-                    ForFade[z].color = Color.Lerp(Color.white, Color.clear, 0f);
-                }
-            }
             stage += 1;
             StageCounter.text = stage.ToString();
             hidden = false;
@@ -171,6 +177,18 @@ public class captchaTheFlagScript : MonoBehaviour {
             }
         } else {
             GetComponent<KMBombModule>().HandleStrike();
+            /*
+            PLACEHOLDER.text = cap;
+            for (int a = 0; a < 6; a++) {
+                Who[a].sprite = Empty;
+            }
+            */
+        }
+
+        if (hidden) {
+            for (int z = 0; z < 3; z++) {
+                ForFade[z].color = Color.white;
+            }
         }
     }
 
