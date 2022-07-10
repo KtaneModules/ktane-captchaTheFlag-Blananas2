@@ -44,6 +44,8 @@ public class captchaTheFlagScript : MonoBehaviour
     private Coroutine buttonHold;
     private bool holding = false;
 
+    private Coroutine fading;
+
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
@@ -166,6 +168,17 @@ public class captchaTheFlagScript : MonoBehaviour
             {
                 StopCoroutine(buttonHold);
             }
+            if (fading != null)
+            {
+                StopCoroutine(fading);
+            }
+            if (!hidden) {
+                for (int z = 0; z < 3; z++)
+                {
+                    ForFade[z].color = Color.Lerp(Color.white, Color.clear, 0f);
+                }
+                held = -1;
+            }
         };
     }
 
@@ -195,9 +208,14 @@ public class captchaTheFlagScript : MonoBehaviour
             }
         }
         held = -1;
+        hidden = false;
+        for (int z = 0; z < 3; z++)
+        {
+            ForFade[z].color = Color.Lerp(Color.white, Color.clear, 0f);
+        }
+
         if (valid)
         {
-            hidden = false;
             stage += 1;
             StageCounter.text = stage.ToString();
             Audio.PlaySoundAtTransform("blip", transform);
@@ -246,7 +264,7 @@ public class captchaTheFlagScript : MonoBehaviour
     IEnumerator HoldChecker(int q)
     {
         yield return new WaitForSeconds(.4f);
-        StartCoroutine(HideStuff());
+        fading = StartCoroutine(HideStuff());
         holding = true;
         held = q;
     }
@@ -261,8 +279,8 @@ public class captchaTheFlagScript : MonoBehaviour
             {
                 ForFade[z].color = Color.Lerp(Color.white, Color.clear, delta);
             }
-            hidden = true;
             yield return null;
         }
+        hidden = true;
     }
 }
