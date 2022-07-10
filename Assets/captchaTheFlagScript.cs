@@ -145,7 +145,9 @@ public class captchaTheFlagScript : MonoBehaviour {
     }
 
     void FlagRelease (KMSelectable f) {
-        StopCoroutine(buttonHold);
+        if (buttonHold != null) {
+            StopCoroutine(buttonHold);
+        }
     }
 
     void Submit () {
