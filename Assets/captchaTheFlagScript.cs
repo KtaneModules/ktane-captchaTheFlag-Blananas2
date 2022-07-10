@@ -7,7 +7,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
 
-public class captchaTheFlagScript : MonoBehaviour {
+public class captchaTheFlagScript : MonoBehaviour
+{
 
     public KMBombInfo Bomb;
     public KMAudio Audio;
@@ -37,23 +38,25 @@ public class captchaTheFlagScript : MonoBehaviour {
     int[] desired = { -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3, -3 };
     int held = -1;
     bool hidden = false;
-    string[] dirNames = { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East", 
+    string[] dirNames = { "North", "North-West", "West", "South-West", "South", "South-East", "East", "North-East",
                           "North", "North-East", "East", "South-East", "South", "South-West", "West", "North-West" };
 
     private Coroutine buttonHold;
-	private bool holding = false;
+    private bool holding = false;
 
     //Logging
     static int moduleIdCounter = 1;
     int moduleId;
     private bool moduleSolved;
 
-    void Awake () {
+    void Awake()
+    {
         moduleId = moduleIdCounter++;
 
-        foreach (KMSelectable FlagButton in FlagButtons) {
-            FlagButton.OnInteract += delegate () { FlagPress(FlagButton); return false; };
-            FlagButton.OnInteractEnded += delegate { FlagRelease(FlagButton); };
+        for (int i = 0; i < FlagButtons.Length; i++)
+        {
+            FlagButtons[i].OnInteract += FlagPress(i);
+            FlagButtons[i].OnInteractEnded += FlagRelease(i);
         }
 
         SubmitButton.OnInteract += delegate () { Submit(); return false; };
@@ -61,8 +64,10 @@ public class captchaTheFlagScript : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
-        for (int c = 0; c < 6; c++) {
+    void Start()
+    {
+        for (int c = 0; c < 6; c++)
+        {
             cap += charset.PickRandom();
         }
         ser = Bomb.GetSerialNumber();
@@ -70,114 +75,140 @@ public class captchaTheFlagScript : MonoBehaviour {
 
         Debug.LogFormat("[Captcha the Flag #{0}] CAPTCHA is {1}, Serial Number is {2}.", moduleId, cap, ser);
 
-        for (int h = 0; h < 6; h++) {
+        for (int h = 0; h < 6; h++)
+        {
             string log = "";
 
             int ix = charset.IndexOf(cap[h]);
             int xi = charset.IndexOf(ser[h]);
-            log = String.Format("Stage {0}: CAPTCHA character is {1}, Serial Number character is {2}. ", h+1, charset[ix], charset[xi]);
+            log = string.Format("Stage {0}: CAPTCHA character is {1}, Serial Number character is {2}. ", h + 1, charset[ix], charset[xi]);
 
-            int leftFlag = sinis[ix]; 
+            int leftFlag = sinis[ix];
             int rightFlag = dextr[ix];
-            log += String.Format("CAPTCHA character in Semaphore is {0} by {1}. ", dirNames[leftFlag], dirNames[rightFlag + 8]);
+            log += string.Format("CAPTCHA character in Semaphore is {0} by {1}. ", dirNames[leftFlag], dirNames[rightFlag + 8]);
 
             bool verti = words[0].Contains(cap[h]);
             bool horiz = words[1].Contains(ser[h]);
 
-            if (verti && horiz) {
+            if (verti && horiz)
+            {
                 int funniest = funny[ix] * funny[xi];
                 log += "Both F1AG and P0LE rules applied. ";
-                if (funniest == 0 || funniest % 2 == 1) {
+                if (funniest == 0 || funniest % 2 == 1)
+                {
                     leftFlag = -1; rightFlag = -1;
                     log += "Left button must be held.";
-                } else {
+                }
+                else
+                {
                     leftFlag = -2; rightFlag = -2;
                     log += "Right button must be held.";
                 }
-            } else {
-                if (verti) {
+            }
+            else
+            {
+                if (verti)
+                {
                     leftFlag = vertiP[leftFlag];
                     rightFlag = vertiP[rightFlag];
-                    log += String.Format("F1AG rule applied. New Semaphore orientations are {0} by {1}.", dirNames[leftFlag], dirNames[rightFlag + 8]);
+                    log += string.Format("F1AG rule applied. New Semaphore orientations are {0} by {1}.", dirNames[leftFlag], dirNames[rightFlag + 8]);
                 }
-                if (horiz) {
+                if (horiz)
+                {
                     leftFlag = horizP[leftFlag];
                     rightFlag = horizP[rightFlag];
-                    log += String.Format("P0LE rule applied. New Semaphore orientations are {0} by {1}.", dirNames[leftFlag], dirNames[rightFlag + 8]);
+                    log += string.Format("P0LE rule applied. New Semaphore orientations are {0} by {1}.", dirNames[leftFlag], dirNames[rightFlag + 8]);
                 }
             }
             desired[2 * h] = leftFlag;
-            desired[2 * h + 1] = rightFlag; 
+            desired[2 * h + 1] = rightFlag;
 
             Debug.LogFormat("[Captcha the Flag #{0}] {1}", moduleId, log);
         }
     }
 
-    void GenerateCAPTCHA (string input) {
-        for (int c = 0; c < 6; c++) {
+    void GenerateCAPTCHA(string input)
+    {
+        for (int c = 0; c < 6; c++)
+        {
             int b = charset.IndexOf(input[c]);
             Who[c].sprite = Cares[b * 36 + UnityEngine.Random.Range(0, 36)];
         }
     }
 
-    void FlagPress(KMSelectable f) {
-        if (moduleSolved) { return; }
-        int y = -1;
+    KMSelectable.OnInteractHandler FlagPress(int f)
+    {
+        return delegate ()
+        {
+            if (moduleSolved) return false;
+            StartCoroutine(TurnFlag(f));
 
-        if (f == FlagButtons[0]) {
-            StartCoroutine(TurnFlag(0));
-            y = 0;
-        } else {
-            StartCoroutine(TurnFlag(1));
-            y = 1;
-        }
+            if (buttonHold != null)
+            {
+                holding = false;
+                StopCoroutine(buttonHold);
+                buttonHold = null;
+            }
 
-        if (buttonHold != null)
-		{
-			holding = false;
-			StopCoroutine(buttonHold);
-			buttonHold = null;
-		}
-
-        if (held == -1) {
-            buttonHold = StartCoroutine(HoldChecker(y));
-        }
+            if (held == -1)
+            {
+                buttonHold = StartCoroutine(HoldChecker(f));
+            }
+            return false;
+        };
     }
 
-    void FlagRelease (KMSelectable f) {
-        if (buttonHold != null) {
-            StopCoroutine(buttonHold);
-        }
+    Action FlagRelease(int f)
+    {
+        return delegate ()
+        {
+            if (buttonHold != null)
+            {
+                StopCoroutine(buttonHold);
+            }
+        };
     }
 
-    void Submit () {
+    void Submit()
+    {
         if (moduleSolved) { return; }
         bool valid = false;
-        if (desired[2*stage] == -1) {
-            if (hidden && held == 0) {
-                valid = true;
-            }
-        } else if (desired[2*stage] == -2) {
-            if (hidden && held == 1) {
-                valid = true;
-            }
-        } else if ((flagPos[0] == desired[2 * stage]) && (flagPos[1] == desired[2 * stage + 1])) {
-            if (!hidden) {
+        if (desired[2 * stage] == -1)
+        {
+            if (hidden && held == 0)
+            {
                 valid = true;
             }
         }
-
-        if (valid) {
+        else if (desired[2 * stage] == -2)
+        {
+            if (hidden && held == 1)
+            {
+                valid = true;
+            }
+        }
+        else if ((flagPos[0] == desired[2 * stage]) && (flagPos[1] == desired[2 * stage + 1]))
+        {
+            if (!hidden)
+            {
+                valid = true;
+            }
+        }
+        held = -1;
+        if (valid)
+        {
+            hidden = false;
             stage += 1;
             StageCounter.text = stage.ToString();
-            hidden = false;
-            held = -1;
             Audio.PlaySoundAtTransform("blip", transform);
-            if (stage == 6) {
+            if (stage == 6)
+            {
                 GetComponent<KMBombModule>().HandlePass();
                 moduleSolved = true;
             }
-        } else {
+        }
+        else
+        {
             GetComponent<KMBombModule>().HandleStrike();
             /*
             PLACEHOLDER.text = cap;
@@ -187,8 +218,10 @@ public class captchaTheFlagScript : MonoBehaviour {
             */
         }
 
-        if (hidden) {
-            for (int z = 0; z < 3; z++) {
+        if (hidden)
+        {
+            for (int z = 0; z < 3; z++)
+            {
                 ForFade[z].color = Color.white;
             }
         }
@@ -211,19 +244,21 @@ public class captchaTheFlagScript : MonoBehaviour {
     }
 
     IEnumerator HoldChecker(int q)
-	{
-		yield return new WaitForSeconds(.4f);
+    {
+        yield return new WaitForSeconds(.4f);
         StartCoroutine(HideStuff());
         holding = true;
         held = q;
     }
 
-    IEnumerator HideStuff() {
+    IEnumerator HideStuff()
+    {
         float delta = 0f;
         while (delta < 1)
         {
             delta += 0.33f * Time.deltaTime;
-            for (int z = 0; z < 3; z++) {
+            for (int z = 0; z < 3; z++)
+            {
                 ForFade[z].color = Color.Lerp(Color.white, Color.clear, delta);
             }
             hidden = true;
