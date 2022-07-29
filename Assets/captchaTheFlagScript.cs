@@ -299,4 +299,124 @@ public class captchaTheFlagScript : MonoBehaviour
         }
         hidden = true;
     }
+	
+	//twitch plays
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"To press the blue/red flag button in a certain amount, use the command !{0} press red/blue [1-7] | To hold the blue/red flag button, use the command !{0} hold red/blue | To submit your answer, use !{0} submit";
+    #pragma warning restore 414
+    
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+		string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(command, @"^\s*submit\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return null;
+			SubmitButton.OnInteract();
+		}
+		
+		if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && Regex.IsMatch(parameters[1], @"^\s*red\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return null;
+			if (parameters.Length != 3)
+			{
+				yield return "sendtochaterror Parameter length invalid. Command ignored.";
+				yield break;
+			}
+			
+			if (hidden)
+			{
+				yield return "sendtochaterror The semaphore is hidden. Command ignored.";
+				yield break;
+			}
+			
+			int Out;
+			if (!int.TryParse(parameters[2], out Out))
+			{
+				yield return "sendtochaterror The number given is not valid. Command ignored.";
+				yield break;
+			}
+			
+			if (Out < 1 || Out > 7)
+			{
+				yield return "sendtochaterror The number given is not 1-7. Command ignored.";
+				yield break;
+			}
+			
+			for (int x = 0; x < Out; x++)
+			{
+				FlagButtons[0].OnInteract();
+				yield return new WaitForSecondsRealtime(0.1f);
+				FlagButtons[0].OnInteractEnded();
+				yield return new WaitForSecondsRealtime(0.1f);
+			}
+			
+		}
+		
+		if (Regex.IsMatch(parameters[0], @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) && Regex.IsMatch(parameters[1], @"^\s*blue\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return null;
+			if (parameters.Length != 3)
+			{
+				yield return "sendtochaterror Parameter length invalid. Command ignored.";
+				yield break;
+			}
+			
+			if (hidden)
+			{
+				yield return "sendtochaterror The semaphore is hidden. Command ignored.";
+				yield break;
+			}
+			
+			int Out;
+			if (!int.TryParse(parameters[2], out Out))
+			{
+				yield return "sendtochaterror The number given is not valid. Command ignored.";
+				yield break;
+			}
+			
+			if (Out < 1 || Out > 7)
+			{
+				yield return "sendtochaterror The number given is not 1-7. Command ignored.";
+				yield break;
+			}
+			
+			for (int x = 0; x < Out; x++)
+			{
+				FlagButtons[1].OnInteract();
+				yield return new WaitForSecondsRealtime(0.1f);
+				FlagButtons[1].OnInteractEnded();
+				yield return new WaitForSecondsRealtime(0.1f);
+			}
+			
+		}
+		
+		if (Regex.IsMatch(command, @"^\s*hold red\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return null;
+			if (hidden)
+			{
+				yield return "sendtochaterror The semaphore is already hidden. Command ignored.";
+				yield break;
+			}
+			
+			FlagButtons[0].OnInteract();
+			yield return new WaitForSecondsRealtime(5f);
+			FlagButtons[0].OnInteractEnded();
+		}
+			
+		
+		if (Regex.IsMatch(command, @"^\s*hold blue\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return null;
+			if (hidden)
+			{
+				yield return "sendtochaterror The semaphore is already hidden. Command ignored.";
+				yield break;
+			}
+			
+			FlagButtons[1].OnInteract();
+			yield return new WaitForSecondsRealtime(5f);
+			FlagButtons[1].OnInteractEnded();
+		}
+	}
 }
