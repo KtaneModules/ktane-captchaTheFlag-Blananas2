@@ -190,9 +190,9 @@ public class captchaTheFlagScript : MonoBehaviour
     {
         if (moduleSolved) { return; }
         bool valid = false;
-        if (desired[2 * stage] == -1)
+        if (held == 0)
         {
-            if (hidden && held == 0)
+            if (hidden && desired[2 * stage] == -1)
             {
                 valid = true;
                 Debug.LogFormat("[Captcha the Flag #{0}] Left button held correctly.", moduleId);
@@ -200,9 +200,9 @@ public class captchaTheFlagScript : MonoBehaviour
                 Debug.LogFormat("[Captcha the Flag #{0}] Left button was not held correctly. Strike!", moduleId);
             }
         }
-        else if (desired[2 * stage] == -2)
+        else if (held == 1)
         {
-            if (hidden && held == 1)
+            if (hidden && desired[2 * stage] == -2)
             {
                 valid = true;
                 Debug.LogFormat("[Captcha the Flag #{0}] Right button held correctly.", moduleId);
