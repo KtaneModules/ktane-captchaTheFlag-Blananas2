@@ -75,7 +75,7 @@ public class captchaTheFlagScript : MonoBehaviour
         ser = Bomb.GetSerialNumber();
         GenerateCAPTCHA(cap);
 
-        Debug.LogFormat("[Captcha the Flag #{0}] CAPTCHA is {1}, Serial Number is {2}.", moduleId, cap, ser);
+        Debug.LogFormat("[Captcha The Flag #{0}] CAPTCHA is {1}, Serial Number is {2}.", moduleId, cap, ser);
 
         for (int h = 0; h < 6; h++)
         {
@@ -125,7 +125,7 @@ public class captchaTheFlagScript : MonoBehaviour
             desired[2 * h] = leftFlag;
             desired[2 * h + 1] = rightFlag;
 
-            Debug.LogFormat("[Captcha the Flag #{0}] {1}", moduleId, log);
+            Debug.LogFormat("[Captcha The Flag #{0}] {1}", moduleId, log);
         }
     }
 
@@ -139,7 +139,7 @@ public class captchaTheFlagScript : MonoBehaviour
             Who[c].sprite = Cares[d];
             morelog = morelog + d.ToString() + " ";
         }
-        Debug.LogFormat("<Captcha the Flag #{0}> {1}", moduleId, morelog);
+        Debug.LogFormat("<Captcha The Flag #{0}> {1}", moduleId, morelog);
     }
 
     KMSelectable.OnInteractHandler FlagPress(int f)
@@ -196,11 +196,11 @@ public class captchaTheFlagScript : MonoBehaviour
             if (hidden && desired[2 * stage] == -1)
             {
                 valid = true;
-                Debug.LogFormat("[Captcha the Flag #{0}] Left button held correctly.", moduleId);
+                Debug.LogFormat("[Captcha The Flag #{0}] Left button held correctly.", moduleId);
             }
             else
             {
-                Debug.LogFormat("[Captcha the Flag #{0}] Left button was not held correctly. Strike!", moduleId);
+                Debug.LogFormat("[Captcha The Flag #{0}] Left button was not held correctly. Strike!", moduleId);
             }
         }
         else if (held == 1)
@@ -208,11 +208,11 @@ public class captchaTheFlagScript : MonoBehaviour
             if (hidden && desired[2 * stage] == -2)
             {
                 valid = true;
-                Debug.LogFormat("[Captcha the Flag #{0}] Right button held correctly.", moduleId);
+                Debug.LogFormat("[Captcha The Flag #{0}] Right button held correctly.", moduleId);
             }
             else
             {
-                Debug.LogFormat("[Captcha the Flag #{0}] Right button was not held correctly. Strike!", moduleId);
+                Debug.LogFormat("[Captcha The Flag #{0}] Right button was not held correctly. Strike!", moduleId);
             }
         }
         else if ((flagPos[0] == desired[2 * stage]) && (flagPos[1] == desired[2 * stage + 1]))
@@ -220,11 +220,11 @@ public class captchaTheFlagScript : MonoBehaviour
             if (!hidden)
             {
                 valid = true;
-                Debug.LogFormat("[Captcha the Flag #{0}] Flags set to {0} by {1}, that is correct.", dirNames[flagPos[0]], dirNames[flagPos[1]]);
+                Debug.LogFormat("[Captcha The Flag #{0}] Flags set to {0} by {1}, that is correct.", dirNames[flagPos[0]], dirNames[flagPos[1]]);
             }
             else
             {
-                Debug.LogFormat("[Captcha the Flag #{0}] Flags set to {0} by {1}, that is incorrect. Strike!", dirNames[flagPos[0]], dirNames[flagPos[1]]);
+                Debug.LogFormat("[Captcha The Flag #{0}] Flags set to {0} by {1}, that is incorrect. Strike!", dirNames[flagPos[0]], dirNames[flagPos[1]]);
             }
         }
         held = -1;
@@ -240,7 +240,7 @@ public class captchaTheFlagScript : MonoBehaviour
             StageCounter.text = stage.ToString();
             if (stage == 6)
             {
-                Debug.LogFormat("[Captcha the Flag #{0}] All 6 stages complete, module solved.", moduleId);
+                Debug.LogFormat("[Captcha The Flag #{0}] All 6 stages complete, module solved.", moduleId);
                 GetComponent<KMBombModule>().HandlePass();
                 moduleSolved = true;
                 Audio.PlaySoundAtTransform("solve", transform);
